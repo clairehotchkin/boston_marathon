@@ -3,30 +3,80 @@
 # How to use function and have slider input of top runners?
 # I am using marathon data, should I use track data instead? Perhaps another tab?
 
+### Cool idea: show top marathon times colored by year (show that faster ones are more recent)
 
 library(janitor)
 library(readr)
-library(chron)
 library(lubridate)
 library(stringr)
+library(chron)
 library(tidyverse)
 
+year
+temp
+rain
 
-# Read in data for each year. 
-# I used data from 2 different sources (both sources scraped data from baa.org)
-# The first source gives me data from 2001-2013.
-# For this source I had to get rid of wheelchair and handcycle participants. 
-# Most wheelchar/handcycle had a letter on their bib #, so I could easily filter them out,
-# Others I had to do by hand. 
-# For the second data source (2015-2017), I just needed to clean up variable names.
+### READ IN AND CLEAN DATA---------------------------------------------------------------------
+
+# I used data from 3 different sources (all sources scraped data from baa.org)
+# Source 1: data from 2001-2012.
+  # https://github.com/llimllib/bostonmarathon
+  # For this source I had to get rid of wheelchair and handcycle participants. Most 
+  # wheelchar/handcycle had a letter on their bib #, so I could easily filter them out,
+  # others I had to do by hand. To check my work: 
+      # separate(division, into  = c("numerator", "denominator"), sep = " / ") %>%
+      # mutate(denominator = as.numeric(denominator)) %>%
+      # filter(denominator > 20)
+  # I also needed to change the official time variable from total minutes to an hour:minute format.
+  # I decided to use an hour:minute format because the rest of my data was formatted this way and
+  # in my graphs I wanted to be able to visualize the information in an accessible way. No one talks
+  # about marathon times in terms of total minutes. Note that this github repo also contains data for
+  # 2013-2014, but I found that it was missing some top finishers.
+# Source 2: data from 2013-2014. 
+  # https://github.com/flashrbt/BostonMarathon
+  # Only thing I needed to change was the official time variable name. 
+# Source 3: data from 2015-2017
+  # https://www.kaggle.com/rojour/boston-results
+  # Cleaned up variable names. 
+  
+# Where to do this?
+  # I added 2 variables to each results dataset: the year that the results came from, 
+  # and the temperature (in degrees F) and weather for that day
 
 results_2001 <- read_csv("2001/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
          handcycle = str_detect(bib, "H")) %>%
   filter(wheelchair == FALSE & handcycle == FALSE) %>%
   mutate(official_time = as_datetime(official)) %>%
-  mutate(official_time = str_remove(official_time, "1970-01-01 00:0")) %>%
-  mutate(year = "2001")
+  mutate(official_time = str_remove(official_time, "1970-01-01 00:")) %>%
+  mutate(seconds_decimal = substr(official, 4, 6)) %>%
+  mutate(seconds_decimal = as.numeric(seconds_decimal)) %>%
+  mutate(seconds = (seconds_decimal * 60)) %>%
+  mutate(seconds = round(seconds, digits = 0)) %>%
+  mutate(seconds = str_pad(seconds, width = 2, side = "left", pad = "0")) %>%
+  mutate(seconds = case_when(is.na(seconds) ~ "00",
+                             TRUE ~ seconds)) %>%
+  mutate(official_time = paste(official_time, seconds, sep = ":")) %>%
+  # rename(time_minutes = official) %>%
+  # mutate(time_minutes = as.character(time_minutes)) %>%
+  # mutate(time_minutes2 = str_pad(time_minutes, width = 4, side = "right", pad = ".")) %>%
+  # mutate(time_minutes3 = str_pad(time_minutes, width = 6, side = "right", pad = "0")) %>%
+  # mutate(minutes1 = as.numeric(substr(time_minutes, 1, 3))) %>%
+  # mutate(hours_real = as.numeric(minutes1 / 60),
+  #        fraction_min = as.numeric(substr(time_minutes, 5, 6))) %>%
+  # mutate(seconds = (fraction_min * 0.6)) %>%
+  # mutate(fraction_min = str_pad(fraction_min, width = 2, side = "left", pad = "0")) %>%
+  # mutate(hours = as.numeric(substr(hours_real, 1, 1))) %>%
+  # mutate(minutes = (minutes1 - (hours * 60))) %>%
+  # mutate(minutes = case_when(minutes <10 ~ str_pad(minutes, width = 2, side = "left", pad = "0"),
+  #                             TRUE ~ as.character(minutes))) %>%
+  # mutate(seconds = case_when(seconds <10 ~ str_pad(minutes, width = 2, side = "left", pad = "0"),
+  #                            is.na(seconds) ~ "00",
+  #                            TRUE ~ as.character(seconds))) %>%
+  # mutate(official_time = paste(hours, minutes, seconds, sep = ":")) %>%
+  # mutate(official_time = substr(official_time, 1, 7)) %>%
+  mutate(year = "2001") %>%
+  select(bib, name, age, gender, country, official_time, year)
   
 results_2002 <- read_csv("2002/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
@@ -38,8 +88,17 @@ results_2002 <- read_csv("2002/results.csv") %>%
          name != "Gur, Zvi",
          name != "Traum, Dick") %>%
   mutate(official_time = as_datetime(official)) %>%
-  mutate(official_time = str_remove(official_time, "1970-01-01 00:0")) %>%
-  mutate(year = "2002")
+  mutate(official_time = str_remove(official_time, "1970-01-01 00:")) %>%
+  mutate(seconds_decimal = substr(official, 4, 6)) %>%
+  mutate(seconds_decimal = as.numeric(seconds_decimal)) %>%
+  mutate(seconds = (seconds_decimal * 60)) %>%
+  mutate(seconds = round(seconds, digits = 0)) %>%
+  mutate(seconds = str_pad(seconds, width = 2, side = "left", pad = "0")) %>%
+  mutate(seconds = case_when(is.na(seconds) ~ "00",
+                             TRUE ~ seconds)) %>%
+  mutate(official_time = paste(official_time, seconds, sep = ":")) %>%
+  mutate(year = "2002") %>%
+  select(bib, name, age, gender, country, official_time, year)
 
 results_2003 <- read_csv("2003/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
@@ -47,8 +106,17 @@ results_2003 <- read_csv("2003/results.csv") %>%
   filter(wheelchair == FALSE & handcycle == FALSE) %>%
   filter(name != "Corral, Ricardo V.") %>%
   mutate(official_time = as_datetime(official)) %>%
-  mutate(official_time = str_remove(official_time, "1970-01-01 00:0")) %>%
-  mutate(year = "2003")
+  mutate(official_time = str_remove(official_time, "1970-01-01 00:")) %>%
+  mutate(seconds_decimal = substr(official, 4, 6)) %>%
+  mutate(seconds_decimal = as.numeric(seconds_decimal)) %>%
+  mutate(seconds = (seconds_decimal * 60)) %>%
+  mutate(seconds = round(seconds, digits = 0)) %>%
+  mutate(seconds = str_pad(seconds, width = 2, side = "left", pad = "0")) %>%
+  mutate(seconds = case_when(is.na(seconds) ~ "00",
+                             TRUE ~ seconds)) %>%
+  mutate(official_time = paste(official_time, seconds, sep = ":")) %>%
+  mutate(year = "2003") %>%
+  select(bib, name, age, gender, country, official_time, year)
 
 results_2004 <- read_csv("2004/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
@@ -62,8 +130,17 @@ results_2004 <- read_csv("2004/results.csv") %>%
          name != "Hines, Helene A.",
          name != "Beehner, Harrilyn M.") %>%
   mutate(official_time = as_datetime(official)) %>%
-  mutate(official_time = str_remove(official_time, "1970-01-01 00:0")) %>%
-  mutate(year = "2004")
+  mutate(official_time = str_remove(official_time, "1970-01-01 00:")) %>%
+  mutate(seconds_decimal = substr(official, 4, 6)) %>%
+  mutate(seconds_decimal = as.numeric(seconds_decimal)) %>%
+  mutate(seconds = (seconds_decimal * 60)) %>%
+  mutate(seconds = round(seconds, digits = 0)) %>%
+  mutate(seconds = str_pad(seconds, width = 2, side = "left", pad = "0")) %>%
+  mutate(seconds = case_when(is.na(seconds) ~ "00",
+                             TRUE ~ seconds)) %>%
+  mutate(official_time = paste(official_time, seconds, sep = ":")) %>%
+  mutate(year = "2004") %>%
+  select(bib, name, age, gender, country, official_time, year)
 
 results_2005 <- read_csv("2005/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
@@ -76,8 +153,17 @@ results_2005 <- read_csv("2005/results.csv") %>%
          name != "Caesar, Hilbert",
          name != "Szymanski, Monica") %>%
   mutate(official_time = as_datetime(official)) %>%
-  mutate(official_time = str_remove(official_time, "1970-01-01 00:0")) %>%
-  mutate(year = "2005")
+  mutate(official_time = str_remove(official_time, "1970-01-01 00:")) %>%
+  mutate(seconds_decimal = substr(official, 4, 6)) %>%
+  mutate(seconds_decimal = as.numeric(seconds_decimal)) %>%
+  mutate(seconds = (seconds_decimal * 60)) %>%
+  mutate(seconds = round(seconds, digits = 0)) %>%
+  mutate(seconds = str_pad(seconds, width = 2, side = "left", pad = "0")) %>%
+  mutate(seconds = case_when(is.na(seconds) ~ "00",
+                             TRUE ~ seconds)) %>%
+  mutate(official_time = paste(official_time, seconds, sep = ":")) %>%
+  mutate(year = "2005") %>%
+  select(bib, name, age, gender, country, official_time, year)
 
 results_2006 <- read_csv("2006/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
@@ -90,7 +176,17 @@ results_2006 <- read_csv("2006/results.csv") %>%
          name != "Traum, Dick",
          name != "Beehner, Harrilyn M.") %>%
   mutate(official_time = as_datetime(official)) %>%
-  mutate(official_time = str_remove(official_time, "1970-01-01 00:0")) 
+  mutate(official_time = str_remove(official_time, "1970-01-01 00:")) %>%
+  mutate(seconds_decimal = substr(official, 4, 6)) %>%
+  mutate(seconds_decimal = as.numeric(seconds_decimal)) %>%
+  mutate(seconds = (seconds_decimal * 60)) %>%
+  mutate(seconds = round(seconds, digits = 0)) %>%
+  mutate(seconds = str_pad(seconds, width = 2, side = "left", pad = "0")) %>%
+  mutate(seconds = case_when(is.na(seconds) ~ "00",
+                             TRUE ~ seconds)) %>%
+  mutate(official_time = paste(official_time, seconds, sep = ":")) %>%
+  mutate(year = "2006") %>%
+  select(bib, name, age, gender, country, official_time, year)
 
 results_2007 <- read_csv("2007/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
@@ -99,9 +195,21 @@ results_2007 <- read_csv("2007/results.csv") %>%
   filter(name != "Philpott, Todd",
          name != "Skrzypinski, Arkadiusz",
          name != "Robinson, Rodger",
-         name != "Hines, Helene A.") %>%
+         name != "Hines, Helene A.",
+         name != "Traum, Richard",
+         name != "Beaulieu, Jack E.") %>%
   mutate(official_time = as_datetime(official)) %>%
-  mutate(official_time = str_remove(official_time, "1970-01-01 00:0")) 
+  mutate(official_time = str_remove(official_time, "1970-01-01 00:")) %>%
+  mutate(seconds_decimal = substr(official, 4, 6)) %>%
+  mutate(seconds_decimal = as.numeric(seconds_decimal)) %>%
+  mutate(seconds = (seconds_decimal * 60)) %>%
+  mutate(seconds = round(seconds, digits = 0)) %>%
+  mutate(seconds = str_pad(seconds, width = 2, side = "left", pad = "0")) %>%
+  mutate(seconds = case_when(is.na(seconds) ~ "00",
+                             TRUE ~ seconds)) %>%
+  mutate(official_time = paste(official_time, seconds, sep = ":")) %>%
+  mutate(year = "2007") %>%
+  select(bib, name, age, gender, country, official_time, year)
 
 results_2008 <- read_csv("2008/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
@@ -113,9 +221,20 @@ results_2008 <- read_csv("2008/results.csv") %>%
          name != "Ayres, Chris",
          name != "Jacobs, Daniel",
          name != "Egger, Ralph W.",
-         name != "Greene, Travis") %>%
+         name != "Greene, Travis", 
+         name != "Spinetto, Stephen M.") %>%
   mutate(official_time = as_datetime(official)) %>%
-  mutate(official_time = str_remove(official_time, "1970-01-01 00:0")) 
+  mutate(official_time = str_remove(official_time, "1970-01-01 00:")) %>%
+  mutate(seconds_decimal = substr(official, 4, 6)) %>%
+  mutate(seconds_decimal = as.numeric(seconds_decimal)) %>%
+  mutate(seconds = (seconds_decimal * 60)) %>%
+  mutate(seconds = round(seconds, digits = 0)) %>%
+  mutate(seconds = str_pad(seconds, width = 2, side = "left", pad = "0")) %>%
+  mutate(seconds = case_when(is.na(seconds) ~ "00",
+                             TRUE ~ seconds)) %>%
+  mutate(official_time = paste(official_time, seconds, sep = ":")) %>%
+  mutate(year = "2008") %>%
+  select(bib, name, age, gender, country, official_time, year)
 
 results_2009 <- read_csv("2009/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
@@ -144,72 +263,172 @@ results_2009 <- read_csv("2009/results.csv") %>%
          name != "Major, Ryan", 
          name != "Ripatti, Kristina L.") %>%
   mutate(official_time = as_datetime(official)) %>%
-  mutate(official_time = str_remove(official_time, "1970-01-01 00:0")) %>%
-  View()
+  mutate(official_time = str_remove(official_time, "1970-01-01 00:")) %>%
+  mutate(seconds_decimal = substr(official, 4, 6)) %>%
+  mutate(seconds_decimal = as.numeric(seconds_decimal)) %>%
+  mutate(seconds = (seconds_decimal * 60)) %>%
+  mutate(seconds = round(seconds, digits = 0)) %>%
+  mutate(seconds = str_pad(seconds, width = 2, side = "left", pad = "0")) %>%
+  mutate(seconds = case_when(is.na(seconds) ~ "00",
+                             TRUE ~ seconds)) %>%
+  mutate(official_time = paste(official_time, seconds, sep = ":")) %>%
+  mutate(year = "2009") %>%
+  select(bib, name, age, gender, country, official_time, year)
 
 results_2010 <- read_csv("2010/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
          handcycle = str_detect(bib, "H")) %>%
   filter(wheelchair == FALSE & handcycle == FALSE) %>%
-  separate(division, into  = c("numerator", "denominator"), sep = " / ") %>%
-  mutate(denominator = as.numeric(denominator)) %>%
-  filter(denominator > 20) %>%
-  View()
+  filter(name != "De Los Santos, Alfredo",
+         name != "Kinard, Andrew",
+         name != "Rooney, Pete",
+         name != "Murphy, Michael G.",
+         name != "Reynolds, William III",
+         name != "Corral, Ricardo V. PhD.", 
+         name != "Triangeli, Pier Jr.",
+         name != "Harvey, Ron", 
+         name != "Devine, John",
+         name != "Hicks, Brian", 
+         name != "Tuohy, Josh", 
+         name != "Smith, Craig",
+         name != "Traum, Dick", 
+         name != "Morales, Luis") %>%
+  mutate(official_time = as_datetime(official)) %>%
+  mutate(official_time = str_remove(official_time, "1970-01-01 00:")) %>%
+  mutate(seconds_decimal = substr(official, 4, 6)) %>%
+  mutate(seconds_decimal = as.numeric(seconds_decimal)) %>%
+  mutate(seconds = (seconds_decimal * 60)) %>%
+  mutate(seconds = round(seconds, digits = 0)) %>%
+  mutate(seconds = str_pad(seconds, width = 2, side = "left", pad = "0")) %>%
+  mutate(seconds = case_when(is.na(seconds) ~ "00",
+                             TRUE ~ seconds)) %>%
+  mutate(official_time = paste(official_time, seconds, sep = ":")) %>%
+  mutate(year = "2010") %>%
+  select(bib, name, age, gender, country, official_time, year)
 
 results_2011 <- read_csv("2011/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
          handcycle = str_detect(bib, "H")) %>%
-  filter(wheelchair == FALSE & handcycle == FALSE)
+  filter(wheelchair == FALSE & handcycle == FALSE) %>%
+  mutate(official_time = as_datetime(official)) %>%
+  mutate(official_time = str_remove(official_time, "1970-01-01 00:")) %>%
+  mutate(seconds_decimal = substr(official, 4, 6)) %>%
+  mutate(seconds_decimal = as.numeric(seconds_decimal)) %>%
+  mutate(seconds = (seconds_decimal * 60)) %>%
+  mutate(seconds = round(seconds, digits = 0)) %>%
+  mutate(seconds = str_pad(seconds, width = 2, side = "left", pad = "0")) %>%
+  mutate(seconds = case_when(is.na(seconds) ~ "00",
+                             TRUE ~ seconds)) %>%
+  mutate(official_time = paste(official_time, seconds, sep = ":")) %>%
+  mutate(year = "2011") %>%
+  select(bib, name, age, gender, country, official_time, year)
 
 results_2012 <- read_csv("2012/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
          handcycle = str_detect(bib, "H")) %>%
-  filter(wheelchair == FALSE & handcycle == FALSE)
+  filter(wheelchair == FALSE & handcycle == FALSE) %>%
+  mutate(official_time = as_datetime(official)) %>%
+  mutate(official_time = str_remove(official_time, "1970-01-01 00:0")) %>%
+  mutate(seconds_decimal = substr(official, 4, 6)) %>%
+  mutate(seconds_decimal = as.numeric(seconds_decimal)) %>%
+  mutate(seconds = (seconds_decimal * 60)) %>%
+  mutate(seconds = round(seconds, digits = 0)) %>%
+  mutate(seconds = str_pad(seconds, width = 2, side = "left", pad = "0")) %>%
+  mutate(seconds = case_when(is.na(seconds) ~ "00",
+                             TRUE ~ seconds)) %>%
+  mutate(official_time = paste(official_time, seconds, sep = ":")) %>%
+  mutate(year = "2012") %>%
+  select(bib, name, age, gender, country, official_time, year)
 
-results_2013 <- read_csv("2013/results.csv") %>%
-  mutate(wheelchair = str_detect(bib, "W"),
-         handcycle = str_detect(bib, "H")) %>%
-  filter(wheelchair == FALSE & handcycle == FALSE)
+results_2013 <- read_csv("bm_split2013.csv") %>%
+  rename(official_time = offt) %>%
+  mutate(official_time = as.character(official_time)) %>%
+  mutate(year = "2013") %>%
+  select(bib, name, age, gender, country, official_time, year)
 
-results_2014 <- read_csv("2014/results.csv") %>%
-  mutate(wheelchair = str_detect(bib, "W"),
-         handcycle = str_detect(bib, "H")) %>%
-  filter(wheelchair == FALSE & handcycle == FALSE)
+results_2014 <- read_csv("bm_split2014.csv") %>%
+  rename(official_time = offt) %>%
+  mutate(official_time = as.character(official_time)) %>%
+  mutate(year = "2014") %>%
+  select(bib, name, age, gender, country, official_time, year)
 
 results_2015 <- read_csv("marathon_results_2015.csv") %>%
-  clean_names()
+  clean_names() %>%
+  mutate(official_time = as.character(official_time)) %>%
+  mutate(year = "2015") %>%
+  select(bib, name, age, m_f, country, official_time, year) %>%
+  rename(gender = m_f) 
 
 results_2016 <- read_csv("marathon_results_2016.csv") %>%
-  clean_names()
+  clean_names() %>%
+  mutate(official_time = as.character(official_time)) %>%
+  mutate(year = "2016") %>%
+  select(bib, name, age, m_f, country, official_time, year) %>%
+  rename(gender = m_f) 
 
 results_2017 <- read_csv("marathon_results_2017.csv") %>%
-  clean_names() 
+  clean_names() %>%
+  mutate(official_time = as.character(official_time)) %>%
+  mutate(year = "2017") %>%
+  select(bib, name, age, m_f, country, official_time, year) %>%
+  rename(gender = m_f) 
 
-# Create function which returns top 25 performances 
-top_25_men <- function(x){
-    x %>%
+### ANALYZE DATA----------------------------------------------------------------------------------
+
+# Create giant table of all results 
+
+all_years_data <- bind_rows(results_2001, results_2002, results_2003, results_2004,
+                            results_2005, results_2006, results_2007, results_2008,
+                            results_2009, results_2010, results_2011, results_2012,
+                            results_2013, results_2014, results_2015, results_2016,
+                            results_2017) 
+
+  mutate(official_time_real = substr(official_time, 1, 5)) %>%
+  mutate(hours = substr(official_time_real, 1, 1))
+
+# What if I treat year as a factor variable 
+  mutate(year = as.factor(year)) %>%
+  mutate(official_time = as.double.POSIXlt(official_time)) %>%
+  View()
+  
+  
+  ggplot(aes(x = year, y = official_time))
+
+# Create function which returns top 25 performances
+
+top_men <- function(x, top_num){
+  x %>%
     filter(gender == "M") %>%
-    arrange((official)) %>%
-    head(25) 
+    arrange((official_time)) %>%
+    head(top_num) 
 }
 
-# IT WORKS!!!
-top_25_men(results_2003) %>%
+top_men(results_2001, 25) %>%
   View()
 
 # Join together tables of top 25 men
-all_years_top_men <- bind_rows(top_25_men(results_2001), top_25_men(results_2002),
-                               top_25_men(results_2003), top_25_men(results_2004),
-                               top_25_men(results_2005))
+
+all_years_top_men <- bind_rows(top_men(results_2001, 25), top_men(results_2002, 25),
+                               top_men(results_2003, 25), top_men(results_2004, 25),
+                               top_men(results_2005, 25), top_men(results_2006, 25),
+                               top_men(results_2007, 25), top_men(results_2008, 25),
+                               top_men(results_2009, 25), top_men(results_2010, 25),
+                               top_men(results_2011, 25), top_men(results_2012, 25),
+                               top_men(results_2013, 25), top_men(results_2014, 25),
+                               top_men(results_2015, 25), top_men(results_2016, 25),
+                               top_men(results_2017, 25))
 
 # Create graph of top times over the years
+# Could also plot temperature? (Either as line or color points)
+
 all_years_top_men %>%
-  select(official_time, official, year, gender) %>%
+  select(official_time, year, gender) %>%
   group_by(year) %>%
-  summarize(avg_time = mean(official)) %>%
+  summarize(avg_time = mean(official_time)) %>%
   ggplot(aes(x = year, y = avg_time)) +
   geom_point()
-  
+
+# 
  
 # Top countries graph
 top_countries <- results_2017 %>%

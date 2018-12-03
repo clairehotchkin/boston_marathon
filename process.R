@@ -9,7 +9,6 @@ library(janitor)
 library(readr)
 library(lubridate)
 library(stringr)
-library(chron)
 library(tidyverse)
 
 year
@@ -43,7 +42,7 @@ rain
   # I added 2 variables to each results dataset: the year that the results came from, 
   # and the temperature (in degrees F) and weather for that day
 
-results_2001 <- read_csv("2001/results.csv") %>%
+results_2001 <- read_csv("data/2001/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
          handcycle = str_detect(bib, "H")) %>%
   filter(wheelchair == FALSE & handcycle == FALSE) %>%
@@ -78,7 +77,7 @@ results_2001 <- read_csv("2001/results.csv") %>%
   mutate(year = "2001") %>%
   select(bib, name, age, gender, country, official_time, year)
   
-results_2002 <- read_csv("2002/results.csv") %>%
+results_2002 <- read_csv("data/2002/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
          handcycle = str_detect(bib, "H")) %>%
   filter(wheelchair == FALSE & handcycle == FALSE) %>%
@@ -100,7 +99,7 @@ results_2002 <- read_csv("2002/results.csv") %>%
   mutate(year = "2002") %>%
   select(bib, name, age, gender, country, official_time, year)
 
-results_2003 <- read_csv("2003/results.csv") %>%
+results_2003 <- read_csv("data/2003/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
          handcycle = str_detect(bib, "H")) %>%
   filter(wheelchair == FALSE & handcycle == FALSE) %>%
@@ -118,7 +117,7 @@ results_2003 <- read_csv("2003/results.csv") %>%
   mutate(year = "2003") %>%
   select(bib, name, age, gender, country, official_time, year)
 
-results_2004 <- read_csv("2004/results.csv") %>%
+results_2004 <- read_csv("data/2004/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
          handcycle = str_detect(bib, "H")) %>%
   filter(wheelchair == FALSE & handcycle == FALSE) %>%
@@ -142,7 +141,7 @@ results_2004 <- read_csv("2004/results.csv") %>%
   mutate(year = "2004") %>%
   select(bib, name, age, gender, country, official_time, year)
 
-results_2005 <- read_csv("2005/results.csv") %>%
+results_2005 <- read_csv("data/2005/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
          handcycle = str_detect(bib, "H")) %>%
   filter(wheelchair == FALSE & handcycle == FALSE) %>%
@@ -165,7 +164,7 @@ results_2005 <- read_csv("2005/results.csv") %>%
   mutate(year = "2005") %>%
   select(bib, name, age, gender, country, official_time, year)
 
-results_2006 <- read_csv("2006/results.csv") %>%
+results_2006 <- read_csv("data/2006/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
          handcycle = str_detect(bib, "H")) %>%
   filter(wheelchair == FALSE & handcycle == FALSE) %>%
@@ -188,7 +187,7 @@ results_2006 <- read_csv("2006/results.csv") %>%
   mutate(year = "2006") %>%
   select(bib, name, age, gender, country, official_time, year)
 
-results_2007 <- read_csv("2007/results.csv") %>%
+results_2007 <- read_csv("data/2007/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
          handcycle = str_detect(bib, "H")) %>%
   filter(wheelchair == FALSE & handcycle == FALSE) %>%
@@ -211,7 +210,7 @@ results_2007 <- read_csv("2007/results.csv") %>%
   mutate(year = "2007") %>%
   select(bib, name, age, gender, country, official_time, year)
 
-results_2008 <- read_csv("2008/results.csv") %>%
+results_2008 <- read_csv("data/2008/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
          handcycle = str_detect(bib, "H")) %>%
   filter(wheelchair == FALSE & handcycle == FALSE) %>%
@@ -222,7 +221,11 @@ results_2008 <- read_csv("2008/results.csv") %>%
          name != "Jacobs, Daniel",
          name != "Egger, Ralph W.",
          name != "Greene, Travis", 
-         name != "Spinetto, Stephen M.") %>%
+         name != "Spinetto, Stephen M.",
+         name != "Traum, Richard",
+         name != "Tyndall, Mackey J.",
+         name != "Rooney, Peter",
+         name != "Dentler, Minda J.") %>%
   mutate(official_time = as_datetime(official)) %>%
   mutate(official_time = str_remove(official_time, "1970-01-01 00:")) %>%
   mutate(seconds_decimal = substr(official, 4, 6)) %>%
@@ -236,7 +239,7 @@ results_2008 <- read_csv("2008/results.csv") %>%
   mutate(year = "2008") %>%
   select(bib, name, age, gender, country, official_time, year)
 
-results_2009 <- read_csv("2009/results.csv") %>%
+results_2009 <- read_csv("data/2009/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
          handcycle = str_detect(bib, "H")) %>%
   filter(wheelchair == FALSE & handcycle == FALSE) %>%
@@ -275,7 +278,7 @@ results_2009 <- read_csv("2009/results.csv") %>%
   mutate(year = "2009") %>%
   select(bib, name, age, gender, country, official_time, year)
 
-results_2010 <- read_csv("2010/results.csv") %>%
+results_2010 <- read_csv("data/2010/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
          handcycle = str_detect(bib, "H")) %>%
   filter(wheelchair == FALSE & handcycle == FALSE) %>%
@@ -306,7 +309,7 @@ results_2010 <- read_csv("2010/results.csv") %>%
   mutate(year = "2010") %>%
   select(bib, name, age, gender, country, official_time, year)
 
-results_2011 <- read_csv("2011/results.csv") %>%
+results_2011 <- read_csv("data/2011/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
          handcycle = str_detect(bib, "H")) %>%
   filter(wheelchair == FALSE & handcycle == FALSE) %>%
@@ -323,7 +326,7 @@ results_2011 <- read_csv("2011/results.csv") %>%
   mutate(year = "2011") %>%
   select(bib, name, age, gender, country, official_time, year)
 
-results_2012 <- read_csv("2012/results.csv") %>%
+results_2012 <- read_csv("data/2012/results.csv") %>%
   mutate(wheelchair = str_detect(bib, "W"),
          handcycle = str_detect(bib, "H")) %>%
   filter(wheelchair == FALSE & handcycle == FALSE) %>%
@@ -340,33 +343,33 @@ results_2012 <- read_csv("2012/results.csv") %>%
   mutate(year = "2012") %>%
   select(bib, name, age, gender, country, official_time, year)
 
-results_2013 <- read_csv("bm_split2013.csv") %>%
+results_2013 <- read_csv("data/bm_split2013.csv") %>%
   rename(official_time = offt) %>%
   mutate(official_time = as.character(official_time)) %>%
   mutate(year = "2013") %>%
   select(bib, name, age, gender, country, official_time, year)
 
-results_2014 <- read_csv("bm_split2014.csv") %>%
+results_2014 <- read_csv("data/bm_split2014.csv") %>%
   rename(official_time = offt) %>%
   mutate(official_time = as.character(official_time)) %>%
   mutate(year = "2014") %>%
   select(bib, name, age, gender, country, official_time, year)
 
-results_2015 <- read_csv("marathon_results_2015.csv") %>%
+results_2015 <- read_csv("data/marathon_results_2015.csv") %>%
   clean_names() %>%
   mutate(official_time = as.character(official_time)) %>%
   mutate(year = "2015") %>%
   select(bib, name, age, m_f, country, official_time, year) %>%
   rename(gender = m_f) 
 
-results_2016 <- read_csv("marathon_results_2016.csv") %>%
+results_2016 <- read_csv("data/marathon_results_2016.csv") %>%
   clean_names() %>%
   mutate(official_time = as.character(official_time)) %>%
   mutate(year = "2016") %>%
   select(bib, name, age, m_f, country, official_time, year) %>%
   rename(gender = m_f) 
 
-results_2017 <- read_csv("marathon_results_2017.csv") %>%
+results_2017 <- read_csv("data/marathon_results_2017.csv") %>%
   clean_names() %>%
   mutate(official_time = as.character(official_time)) %>%
   mutate(year = "2017") %>%
@@ -381,26 +384,38 @@ all_years_data <- bind_rows(results_2001, results_2002, results_2003, results_20
                             results_2005, results_2006, results_2007, results_2008,
                             results_2009, results_2010, results_2011, results_2012,
                             results_2013, results_2014, results_2015, results_2016,
-                            results_2017) 
+                            results_2017) %>%
+  mutate(hours = as.numeric(substr(official_time, 1, 2))) %>%
+  mutate(minutes = as.numeric(substr(official_time, 4, 5))) %>%
+  mutate(seconds = as.numeric(substr(official_time, 7, 8))) %>%
+  mutate(time_minutes = (hours * 60) + minutes + (seconds / 60 ))
 
-  mutate(official_time_real = substr(official_time, 1, 5)) %>%
-  mutate(hours = substr(official_time_real, 1, 1))
+all_years_data %>%
+write_rds(path = "all_years_data")
 
-# What if I treat year as a factor variable 
-  mutate(year = as.factor(year)) %>%
-  mutate(official_time = as.double.POSIXlt(official_time)) %>%
+# What if I treat year as a factor variable
+all_years_top_men %>%
+  mutate(hours = as.numeric(substr(official_time, 1, 2))) %>%
+  mutate(minutes = as.numeric(substr(official_time, 4, 5))) %>%
+  mutate(seconds = as.numeric(substr(official_time, 7, 8))) %>%
+  mutate(time_minutes = (hours * 60) + minutes + (seconds / 60 )) %>%
   View()
-  
-  
-  ggplot(aes(x = year, y = official_time))
+  group_by(year) %>%
+  summarize(avg_time = mean(time_minutes)) %>%
+  #mutate(year = as.factor(year)) %>%
+  View()
+  ggplot(aes(x = year, y = avg_time)) + 
+  geom_point()
 
+  
+  
 # Create function which returns top 25 performances
 
 top_men <- function(x, top_num){
   x %>%
     filter(gender == "M") %>%
     arrange((official_time)) %>%
-    head(top_num) 
+    head(top_num)
 }
 
 top_men(results_2001, 25) %>%

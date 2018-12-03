@@ -331,7 +331,7 @@ results_2012 <- read_csv("data/2012/results.csv") %>%
          handcycle = str_detect(bib, "H")) %>%
   filter(wheelchair == FALSE & handcycle == FALSE) %>%
   mutate(official_time = as_datetime(official)) %>%
-  mutate(official_time = str_remove(official_time, "1970-01-01 00:0")) %>%
+  mutate(official_time = str_remove(official_time, "1970-01-01 00:")) %>%
   mutate(seconds_decimal = substr(official, 4, 6)) %>%
   mutate(seconds_decimal = as.numeric(seconds_decimal)) %>%
   mutate(seconds = (seconds_decimal * 60)) %>%
@@ -379,7 +379,6 @@ results_2017 <- read_csv("data/marathon_results_2017.csv") %>%
 ### ANALYZE DATA----------------------------------------------------------------------------------
 
 # Create giant table of all results 
-
 all_years_data <- bind_rows(results_2001, results_2002, results_2003, results_2004,
                             results_2005, results_2006, results_2007, results_2008,
                             results_2009, results_2010, results_2011, results_2012,
@@ -393,20 +392,48 @@ all_years_data <- bind_rows(results_2001, results_2002, results_2003, results_20
 all_years_data %>%
 write_rds(path = "all_years_data")
 
-# What if I treat year as a factor variable
+# Temperature graph
 all_years_top_men %>%
   mutate(hours = as.numeric(substr(official_time, 1, 2))) %>%
   mutate(minutes = as.numeric(substr(official_time, 4, 5))) %>%
   mutate(seconds = as.numeric(substr(official_time, 7, 8))) %>%
   mutate(time_minutes = (hours * 60) + minutes + (seconds / 60 )) %>%
-  View()
   group_by(year) %>%
   summarize(avg_time = mean(time_minutes)) %>%
-  #mutate(year = as.factor(year)) %>%
-  View()
-  ggplot(aes(x = year, y = avg_time)) + 
-  geom_point()
-
+  mutate(year = as.numeric(year)) %>%
+  mutate(temp = case_when(year == 2001 ~ 54,
+                          year == 2002 ~ 56, 
+                          year == 2003 ~ 59,
+                          year == 2004 ~ 86,
+                          year == 2005 ~ 66,
+                          year == 2006 ~ 53,
+                          year == 2007 ~ 50,
+                          year == 2008 ~ 53,
+                          year == 2009 ~ 47,
+                          year == 2010 ~ 49,
+                          year == 2011 ~ 55,
+                          year == 2012 ~ 87,
+                          year == 2013 ~ 54,
+                          year == 2014 ~ 63,
+                          year == 2015 ~ 44,
+                          year == 2016 ~ 61,
+                          year == 2017 ~ 73)) %>%
+  ggplot(aes(x = temp, y = avg_time)) +
+  geom_line() + 
+  geom_smooth()
+  
+  ggplot(aes(x = year)) + 
+  geom_line(aes(y = avg_time)) +
+  geom_line(aes(y = temp))
+  
+# Let's look at women's data
+all_years_top_100_women %>%
+  mutate(hours = as.numeric(substr(official_time, 1, 2))) %>%
+  mutate(minutes = as.numeric(substr(official_time, 4, 5))) %>%
+  mutate(seconds = as.numeric(substr(official_time, 7, 8))) %>%
+  mutate(time_minutes = (hours * 60) + minutes + (seconds / 60 )) %>%
+  ggplot(aes(x = year, y = time_minutes)) +
+  geom_boxplot() 
   
   
 # Create function which returns top 25 performances
@@ -418,8 +445,13 @@ top_men <- function(x, top_num){
     head(top_num)
 }
 
-top_men(results_2001, 25) %>%
-  View()
+top_women <- function(x, top_num){
+  x %>%
+    filter(gender == "F") %>%
+    arrange((official_time)) %>%
+    head(top_num)
+}
+
 
 # Join together tables of top 25 men
 
@@ -433,6 +465,36 @@ all_years_top_men <- bind_rows(top_men(results_2001, 25), top_men(results_2002, 
                                top_men(results_2015, 25), top_men(results_2016, 25),
                                top_men(results_2017, 25))
 
+all_years_top_100_men <- bind_rows(top_men(results_2001, 100), top_men(results_2002, 100),
+                               top_men(results_2003, 100), top_men(results_2004, 100),
+                               top_men(results_2005, 100), top_men(results_2006, 100),
+                               top_men(results_2007, 100), top_men(results_2008, 100),
+                               top_men(results_2009, 100), top_men(results_2010, 100),
+                               top_men(results_2011, 100), top_men(results_2012, 100),
+                               top_men(results_2013, 100), top_men(results_2014, 100),
+                               top_men(results_2015, 100), top_men(results_2016, 100),
+                               top_men(results_2017, 100))
+
+all_years_top_25_women <- bind_rows(top_women(results_2001, 25), top_women(results_2002, 25),
+                                    top_women(results_2003, 25), top_women(results_2004, 25),
+                                    top_women(results_2005, 25), top_women(results_2006, 25),
+                                    top_women(results_2007, 25), top_women(results_2008, 25),
+                                    top_women(results_2009, 25), top_women(results_2010, 25),
+                                    top_women(results_2011, 25), top_women(results_2012, 25),
+                                    top_women(results_2013, 25), top_women(results_2014, 25),
+                                    top_women(results_2015, 25), top_women(results_2016, 25),
+                                    top_women(results_2017, 25))
+
+all_years_top_100_women <- bind_rows(top_women(results_2001, 100), top_women(results_2002, 100),
+                                    top_women(results_2003, 100), top_women(results_2004, 100),
+                                    top_women(results_2005, 100), top_women(results_2006, 100),
+                                    top_women(results_2007, 100), top_women(results_2008, 100),
+                                    top_women(results_2009, 100), top_women(results_2010, 100),
+                                    top_women(results_2011, 100), top_women(results_2012, 100),
+                                    top_women(results_2013, 100), top_women(results_2014, 100),
+                                    top_women(results_2015, 100), top_women(results_2016, 100),
+                                    top_women(results_2017, 100))
+
 # Create graph of top times over the years
 # Could also plot temperature? (Either as line or color points)
 
@@ -443,9 +505,8 @@ all_years_top_men %>%
   ggplot(aes(x = year, y = avg_time)) +
   geom_point()
 
-# 
  
-# Top countries graph
+# Top countries graph (WORD CLOUD??)
 top_countries <- results_2017 %>%
   group_by(country) %>%
   count() %>%

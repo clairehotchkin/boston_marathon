@@ -433,7 +433,8 @@ all_years_top_100_women %>%
   mutate(seconds = as.numeric(substr(official_time, 7, 8))) %>%
   mutate(time_minutes = (hours * 60) + minutes + (seconds / 60 )) %>%
   ggplot(aes(x = year, y = time_minutes)) +
-  geom_boxplot() 
+  geom_point() + 
+  geom_smooth()
   
   
 # Create function which returns top 25 performances
@@ -518,6 +519,11 @@ results_2017 %>%
   group_by(country) %>%
   ggplot(aes(x = country)) +
   geom_bar()
+
+
+
+wordcloud2(all_years_data, size = 1)
+
 
 # Are results getting faster? Are they geting faster for women disproportionately? 
 results_2017 %>%

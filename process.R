@@ -56,24 +56,6 @@ results_2001 <- read_csv("data/2001/results.csv") %>%
   mutate(seconds = case_when(is.na(seconds) ~ "00",
                              TRUE ~ seconds)) %>%
   mutate(official_time = paste(official_time, seconds, sep = ":")) %>%
-  # rename(time_minutes = official) %>%
-  # mutate(time_minutes = as.character(time_minutes)) %>%
-  # mutate(time_minutes2 = str_pad(time_minutes, width = 4, side = "right", pad = ".")) %>%
-  # mutate(time_minutes3 = str_pad(time_minutes, width = 6, side = "right", pad = "0")) %>%
-  # mutate(minutes1 = as.numeric(substr(time_minutes, 1, 3))) %>%
-  # mutate(hours_real = as.numeric(minutes1 / 60),
-  #        fraction_min = as.numeric(substr(time_minutes, 5, 6))) %>%
-  # mutate(seconds = (fraction_min * 0.6)) %>%
-  # mutate(fraction_min = str_pad(fraction_min, width = 2, side = "left", pad = "0")) %>%
-  # mutate(hours = as.numeric(substr(hours_real, 1, 1))) %>%
-  # mutate(minutes = (minutes1 - (hours * 60))) %>%
-  # mutate(minutes = case_when(minutes <10 ~ str_pad(minutes, width = 2, side = "left", pad = "0"),
-  #                             TRUE ~ as.character(minutes))) %>%
-  # mutate(seconds = case_when(seconds <10 ~ str_pad(minutes, width = 2, side = "left", pad = "0"),
-  #                            is.na(seconds) ~ "00",
-  #                            TRUE ~ as.character(seconds))) %>%
-  # mutate(official_time = paste(hours, minutes, seconds, sep = ":")) %>%
-  # mutate(official_time = substr(official_time, 1, 7)) %>%
   mutate(year = "2001") %>%
   select(bib, name, age, gender, country, official_time, year)
   
@@ -390,7 +372,7 @@ all_years_data <- bind_rows(results_2001, results_2002, results_2003, results_20
   mutate(time_minutes = (hours * 60) + minutes + (seconds / 60 ))
 
 all_years_data %>%
-write_rds(path = "all_years_data")
+write_rds(path = "all_years_data.rds")
 
 # Temperature graph
 all_years_top_men %>%

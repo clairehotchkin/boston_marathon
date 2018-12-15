@@ -1,6 +1,3 @@
-# TAB 1: About 
-  # Wordcloud
-
 library(shiny)
 library(janitor)
 library(readr)
@@ -14,16 +11,17 @@ library(ggrepel)
 library(ggplot2)
 library(tidyverse)
 
-all_years_data <- read_rds(path = "all_years_data")
+all_years_data <- read_rds(path = "all_years_data.rds")
 
 # Define UI for application
-ui <- fluidPage(theme = shinytheme("flatly"),
+ui <- fluidPage(theme = shinytheme("yeti"),
    
     # Application title
     navbarPage("Analyzing Boston Marathon Race Times",
    
    # TAB 1 
       tabPanel("About",
+          htmlOutput("image"),
           htmlOutput("summary")
       ),
         
@@ -52,7 +50,11 @@ ui <- fluidPage(theme = shinytheme("flatly"),
 
 # Define server logic
 server <- function(input, output) {
-
+  
+  output$image <- renderUI({
+    HTML('<center><img src="Bostonmarathonlogo.png" height = 300 width = 325 ></center>')
+  })
+  
   output$summary <- renderUI({
     str1 <- ("Runners keep Getting Faster")
     str2 <- paste("The first Boston Marathon was run in 1897. The winner was John McDermott, 
@@ -132,7 +134,7 @@ server <- function(input, output) {
         ggtitle("Female Race Times Over Time") + 
         xlab("Year") +
         ylab("Average Race Time") 
-        #geom_smooth()
+
     }
   })
   

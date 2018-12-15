@@ -1,0 +1,12 @@
+name: final_project_app
+title: final_project_app
+username:
+account: clairehotchkin
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 552416
+bundleId: 1765765
+url: https://clairehotchkin.shinyapps.io/final_project_app/
+when: 1544906526.40373
+asMultiple: FALSE
+asStatic: FALSE
